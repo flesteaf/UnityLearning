@@ -10,13 +10,17 @@ public class Target : MonoBehaviour
     private const int minForce = 12;
     private const int maxForce = 16;
     private Rigidbody targetRb;
+    private GameManager gameManager;
     private int RandomTorque => Random.Range(-maxTorque, maxTorque);
     private Vector3 RandomXPosition => new Vector3(Random.Range(-xRange, xRange), yPos);
+    public int points;
+    public ParticleSystem explosionParticles;
 
     // Start is called before the first frame update
     void Start()
     {
         targetRb = GetComponent<Rigidbody>();
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
         targetRb.AddForce(RandomUpForce(), ForceMode.Impulse);
 
@@ -35,6 +39,8 @@ public class Target : MonoBehaviour
     private void OnMouseDown() 
     {
         Destroy(gameObject);    
+        gameManager.UpdateScore(points);
+        Instantiate(explosionParticles, transform.position, explosionParticles.transform.rotation);
     }
 
     private void OnTriggerEnter(Collider other) 
