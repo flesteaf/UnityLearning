@@ -13,15 +13,13 @@ public class GameManager : MonoBehaviour
     public Button restartButton;
     public bool isGameAlive;
     private int score;
+    private GameObject titleScreen;
     private float spawnRate => Random.Range(1f, 2f);
 
     // Start is called before the first frame update
     void Start()
     {
-        isGameAlive = true;
-        StartCoroutine(SpawnTarget());
-        score = 0;
-        UpdateScore();
+        titleScreen = GameObject.Find("TitleScreen");
     }
 
     // Update is called once per frame
@@ -48,7 +46,16 @@ public class GameManager : MonoBehaviour
         scoreText.text = $"Score: {score}";
     }
 
-    private IEnumerator SpawnTarget()
+    public void StartGame(int difficulty)
+    {
+        isGameAlive = true;
+        StartCoroutine(SpawnTarget(spawnRate/difficulty));
+        score = 0;
+        UpdateScore();
+        titleScreen.SetActive(false);
+    }
+
+    private IEnumerator SpawnTarget(float spawnRate)
     {
         while (isGameAlive)
         {
