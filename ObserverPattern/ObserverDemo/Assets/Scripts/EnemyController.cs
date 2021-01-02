@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class EnemyController : MonoBehaviour
+public delegate void EnemyDestroyedHandler(int pointValue);
+
+public class EnemyController : MonoBehaviour, IEndGameObserver
 {
     #region Field Declarations
 
@@ -20,10 +22,13 @@ public class EnemyController : MonoBehaviour
     private WaitForSeconds angerDelay;
     private float shotSpeedxN;
     
+
     private Vector2 currentTarget;
     private SpriteRenderer spriteRenderer;
 
     #endregion
+
+    public event EnemyDestroyedHandler EnemyDestroyed;
 
     #region Startup
 
@@ -65,17 +70,25 @@ public class EnemyController : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         Destroy(collision.gameObject);
-
-        FindObjectOfType<PlayerController>().EnableProjectile();
-        FindObjectOfType<HUDController>().UpdateScore(pointValue);
         
         GameObject xPlosion = Instantiate(explosion, transform.position, Quaternion.identity);
         xPlosion.transform.localScale = new Vector2(2, 2);
 
-        Destroy(gameObject);
+        if (EnemyDestroyed != null)
+            EnemyDestroyed(pointValue);
+
+        RemoveAndDestroy();
     }
 
     #endregion
+
+    private void RemoveAndDestroy()
+    {
+        GameSceneController gameSceneController = FindObjectOfType<GameSceneController>();
+        gameSceneController.RemoveObserver(this);
+
+        Destroy(gameObject);
+    }
 
     #region Projectile control
 
@@ -116,6 +129,11 @@ public class EnemyController : MonoBehaviour
         currentTarget = ScreenBounds.GetRandomPosition();
         shotDelay = new WaitForSeconds(shotdelayTime / 3);
         shotSpeed = shotSpeedxN;
+    }
+
+    public void Notify()
+    {
+        Destroy(gameObject);
     }
 
     #endregion

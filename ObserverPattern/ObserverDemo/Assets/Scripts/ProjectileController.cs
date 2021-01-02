@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 public delegate void OutOfBoundsHandler();
 
@@ -10,9 +9,9 @@ public class ProjectileController : MonoBehaviour
     public Vector2 projectileDirection;
     public float projectileSpeed;
     public bool isPlayers;
-    internal OutOfBoundsHandler OutOfBounds;
 
     #endregion
+
 
     #region Movement
 
@@ -30,7 +29,7 @@ public class ProjectileController : MonoBehaviour
         {
             if (isPlayers == true)
             {
-                OutOfBounds?.Invoke();
+                EventBroker.CallProjectileOutOfBounds();
             }
 
             Destroy(gameObject);
